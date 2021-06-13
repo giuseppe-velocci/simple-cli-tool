@@ -1,8 +1,13 @@
 import { Command, CliParam, Param, Flag, PropType, PropConstraint } from "./CommandModels";
+import ParamError from "./ParamError";
 
 export type Either<L, R> = L | R;
 
-export default class ParamExtractor {
+export interface InputParser {
+    parseInput(input: string, command: Command): Either<ParamError, object>
+}
+
+export default class ParamExtractor implements InputParser {
     argsInputDelimiter: string = '-';
     argsSplitDelimiter: string = '_';
     argsFullNameInputDelimiter: string;
@@ -16,12 +21,8 @@ export default class ParamExtractor {
     // command is matched by another method: this one only handles param extraction
     parseInput(input: string, command: Command): Either<ParamError, object> {
         const cliArguments = {};
-       
-        if (!input)
-            return new ParamError('Invalid expression');
 
-        const splitInput: Array<string> = this.normalizeInput(input);
-
+        const splitInput: Array<string> = this.normalizeInput(input, command);
         const matchError = splitInput.map(x => this.findAndStoreParam(command, cliArguments, x));
         if (matchError[0])
             return matchError[0];
@@ -37,12 +38,14 @@ export default class ParamExtractor {
         return cliArguments;
     }
 
-    private normalizeInput(input: string): Array<string> {
-        return input.replace(this.argsFullNameInputDelimiter, this.argsFullNameSplitDelimiter)
-        .split(this.argsInputDelimiter)
-        .filter(x => x !== '');
+    private normalizeInput(input: string, command: Command): Array<string> {
+        return input.replace(command.name, '')
+            .trim()
+            .replace(this.argsFullNameInputDelimiter, this.argsFullNameSplitDelimiter)
+            .split(this.argsInputDelimiter)
+            .filter(x => x !== '');
     }
-       
+
     private findAndStoreParam(command: Command, cliArguments: object, segment: string): ParamError {
         const [param, value] = segment.trim().split(' ');
 
@@ -56,8 +59,12 @@ export default class ParamExtractor {
             ((x: CliParam) => x.shortName === paramString);
 
         const paramObject = command.params.find(matchingFunction);
-        if (!paramObject)
-            return new ParamError(`Invalid parameter ${encodeURI(paramString)}`);
+        if (!paramObject){
+            // search for chained flags, if not found return error
+            const chainedFlagError = this.findChainedFlags(command, cliArguments, paramString);
+            if (chainedFlagError)
+                return chainedFlagError;
+        }
 
         this.storeArguments(cliArguments, paramObject, value);
         return undefined;
@@ -72,10 +79,20 @@ export default class ParamExtractor {
         return undefined;
     }
 
-    private findChainedFlags(args: Array<string>): object {
+    private findChainedFlags(command: Command, cliArguments: object, paramString: string): ParamError {
+        let unhandledInput: string = paramString;
+        const flagsWithShortName = command.params
+            .filter(x => x instanceof Flag && x.shortName.length > 0);
+            
+        flagsWithShortName.map(x => { 
+            unhandledInput = unhandledInput.replace(x.shortName, '');
+            this.storeArguments(cliArguments, x);
+        });
 
+        if (unhandledInput.length > 0)
+            return new ParamError(`Invalid parameter ${encodeURI(paramString)}`);
 
-        return {};
+        return undefined;
     }
 
     private storeFlagsDefaultValue(command: Command, cliArguments: object): void {
@@ -103,10 +120,4 @@ export default class ParamExtractor {
         }
     }
 
-}
-
-export class ParamError extends Error {
-    constructor(message: string) {
-        super(message)
-    }
 }

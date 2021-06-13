@@ -1,20 +1,24 @@
 import { ClIO } from "./ClIO"
 import { Command } from "./CommandModels"
+import { InputParser } from "./ParamExtractor";
+import ParamError from "./ParamError";
 
 class EntryPoint {
     io: ClIO;
     commands: Array<Command>;
+    inputParser: InputParser;
 
-    constructor(commands: Array<Command>, io: ClIO) {
+    constructor(commands: Array<Command>, io: ClIO, inputParser: InputParser) {
         this.commands = commands;
         this.io = io;
+        this.inputParser = inputParser;
     }
 
     start() {
         this.io.prompt(this.handleCommand);
     }
 
-    private handleCommand(input: string) {
+    private handleCommand(input: string): void {
         const cmdInput = input.trim().split(' ')[0]; // TODO should be in position 0 or 1???
         if(!cmdInput)
             this.io.error('invalid input');
@@ -24,11 +28,10 @@ class EntryPoint {
         if(!cmd)
             this.io.error('command not found');
 
-        let parmasNames = this.extractParmasNames(cmd);
-        
-    }
+        const paramsOrError = this.inputParser.parseInput(input, cmd);
+        if (paramsOrError instanceof ParamError)
+            this.io.error(paramsOrError.message);
 
-    private extractParmasNames(cmd: Command) { // moved in class
-        return cmd.params.map(c => c.name);
+        cmd.action(paramsOrError);
     }
 }

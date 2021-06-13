@@ -1,7 +1,7 @@
 export class Command {
     name: string;
     params: Array<CliParam>;
-    action: ({params}) => void;
+    action: (params: object) => void;
 
     constructor(name:string, params: Array<CliParam>, action: ({params}) => void) {
         this.name = name;
@@ -39,7 +39,7 @@ export class Flag implements CliParam {
     shortName: string;
     description: string;
 
-    constructor(name: string, shortName: string, description: string) {
+    constructor(name: string, shortName: string = '', description: string = '') {
         this.name = name;
         this.shortName = shortName;
         this.description = description;
