@@ -1,9 +1,9 @@
 export class Command {
     name: string;
     params: Array<CliParam>;
-    action: (params: object) => void;
+    action: (params: Record<string, any>) => void;
 
-    constructor(name:string, params: Array<CliParam>, action: ({params}) => void) {
+    constructor(name:string, params: Array<CliParam>, action: (params: Record<string, any>) => void) {
         this.name = name;
         this.params = params;
         this.action = action;
@@ -55,5 +55,5 @@ export enum PropType {
 export enum PropConstraint {
     None,
     Required,
-    Excluding, // only one allowed among exclusive params
+    Excluding, // TODO only one allowed among exclusive params
 }

@@ -4,7 +4,7 @@ import ParamError from "./ParamError";
 export type Either<L, R> = L | R;
 
 export interface InputParser {
-    parseInput(input: string, command: Command): Either<ParamError, object>
+    parseInput(input: string, command: Command): Either<ParamError, Record<string, any>>
 }
 
 export default class ParamExtractor implements InputParser {
@@ -19,7 +19,7 @@ export default class ParamExtractor implements InputParser {
     }
 
     // command is matched by another method: this one only handles param extraction
-    parseInput(input: string, command: Command): Either<ParamError, object> {
+    parseInput(input: string, command: Command): Either<ParamError, Record<string, any>> {
         const cliArguments = {};
 
         const splitInput: Array<string> = this.normalizeInput(input, command);
@@ -39,27 +39,29 @@ export default class ParamExtractor implements InputParser {
     }
 
     private normalizeInput(input: string, command: Command): Array<string> {
-        return input.replace(command.name, '')
+        return input.replace(RegExp(command.name, 'i'), '')
             .trim()
             .replace(this.argsFullNameInputDelimiter, this.argsFullNameSplitDelimiter)
             .split(this.argsInputDelimiter)
             .filter(x => x !== '');
     }
 
-    private findAndStoreParam(command: Command, cliArguments: object, segment: string): ParamError {
+    private findAndStoreParam(command: Command, cliArguments: Record<string, any>, segment: string): ParamError {
         const [param, value] = segment.trim().split(' ');
 
         // match by extended or short name
-        const paramString = (param.charAt(0) === this.argsSplitDelimiter) ?
-            param.substring(1) :
-            param;
+        const paramString = (
+            (param.charAt(0) === this.argsSplitDelimiter) ?
+                param.substring(1) :
+                param
+        ).toLowerCase();
 
         const matchingFunction = (param.charAt(0) === this.argsSplitDelimiter) ?
             ((x: CliParam) => x.name === paramString) :
             ((x: CliParam) => x.shortName === paramString);
 
         const paramObject = command.params.find(matchingFunction);
-        if (!paramObject){
+        if (!paramObject) {
             // search for chained flags, if not found return error
             const chainedFlagError = this.findChainedFlags(command, cliArguments, paramString);
             if (chainedFlagError)
@@ -70,7 +72,7 @@ export default class ParamExtractor implements InputParser {
         return undefined;
     };
 
-    private findMissingRequiredParams(command: Command, cliArguments: object): ParamError {
+    private findMissingRequiredParams(command: Command, cliArguments: Record<string, any>): ParamError {
         const missingRequiredParam = command.params.find(cliParam => cliParam instanceof Param &&
             cliParam.constraint === PropConstraint.Required &&
             !cliArguments[cliParam.name])
@@ -79,12 +81,12 @@ export default class ParamExtractor implements InputParser {
         return undefined;
     }
 
-    private findChainedFlags(command: Command, cliArguments: object, paramString: string): ParamError {
+    private findChainedFlags(command: Command, cliArguments: Record<string, any>, paramString: string): ParamError {
         let unhandledInput: string = paramString;
         const flagsWithShortName = command.params
             .filter(x => x instanceof Flag && x.shortName.length > 0);
-            
-        flagsWithShortName.map(x => { 
+
+        flagsWithShortName.map(x => {
             unhandledInput = unhandledInput.replace(x.shortName, '');
             this.storeArguments(cliArguments, x);
         });
@@ -95,7 +97,7 @@ export default class ParamExtractor implements InputParser {
         return undefined;
     }
 
-    private storeFlagsDefaultValue(command: Command, cliArguments: object): void {
+    private storeFlagsDefaultValue(command: Command, cliArguments: Record<string, any>): void {
         command.params.filter(cliParam => cliParam instanceof Flag && !cliArguments[cliParam.name])
             .map((flag) => this.storeArguments(cliArguments, flag, 'false'));
     }

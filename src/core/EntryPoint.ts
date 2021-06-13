@@ -3,9 +3,17 @@ import { Command } from "./CommandModels"
 import { InputParser } from "./ParamExtractor";
 import ParamError from "./ParamError";
 
-class EntryPoint {
-    io: ClIO;
+export interface EntryPoint {
     commands: Array<Command>;
+    io: ClIO;
+    inputParser: InputParser;
+
+    start(): void;
+}
+
+export default class EntryPointImpl implements EntryPoint {
+    commands: Array<Command>;
+    io: ClIO;
     inputParser: InputParser;
 
     constructor(commands: Array<Command>, io: ClIO, inputParser: InputParser) {
@@ -15,23 +23,25 @@ class EntryPoint {
     }
 
     start() {
-        this.io.prompt(this.handleCommand);
+        const handleCommand = this.createCommandHandlerMethod(this);
+        this.io.prompt(handleCommand);
     }
 
-    private handleCommand(input: string): void {
-        const cmdInput = input.trim().split(' ')[0]; // TODO should be in position 0 or 1???
-        if(!cmdInput)
-            this.io.error('invalid input');
-        
-        const cmd = this.commands.find(c => c.name == cmdInput);
+    private createCommandHandlerMethod(instance: EntryPoint): (input: string) => void {
+        return (input: string) => {
+            const cmdInput = input.trim().toLowerCase().split(' ')[0]; // TODO should be in position 0 or 1???
+            if (!cmdInput)
+                instance.io.error('invalid input');
+            const cmd = instance.commands.find(c => c.name == cmdInput);
 
-        if(!cmd)
-            this.io.error('command not found');
+            if (!cmd)
+                instance.io.error('command not found');
 
-        const paramsOrError = this.inputParser.parseInput(input, cmd);
-        if (paramsOrError instanceof ParamError)
-            this.io.error(paramsOrError.message);
+            const paramsOrError = instance.inputParser.parseInput(input, cmd);
+            if (paramsOrError instanceof ParamError)
+                instance.io.error(paramsOrError.message);
 
-        cmd.action(paramsOrError);
+            cmd.action(paramsOrError);
+        }
     }
 }

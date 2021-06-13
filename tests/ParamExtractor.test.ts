@@ -6,7 +6,7 @@ const command = new Command(
     'cmd',
     [
         new Param('par', 'p', PropType.Integer, PropConstraint.Required, 'par description'),
-        new Param('rap', 'r', PropType.Integer, PropConstraint.None, 'par description'),
+        new Param('rap', 'r', PropType.String, PropConstraint.None, 'par description'),
         new Flag('flag', 'f', 'flag description'),
         new Flag('nflag', 'n', 'nflag description')
     ],
@@ -15,9 +15,15 @@ const command = new Command(
 const target = new ParamExtractor();
 
 describe('ParamExtractor', () => {
-    test('Should return an error if an invalid parameter is passed', () => {
+    test('should return an error if an invalid parameter is passed', () => {
         const input = 'cmd --non_exisiting';
         expect(target.parseInput(input, command)).toStrictEqual(new ParamError('Invalid parameter non_exisiting'));
+    });
+
+    test('Command should be case-insensitive', () => {
+        const input = 'CMD -p 2';
+
+        expect(target.parseInput(input, command)).toHaveProperty('par', 2);
     });
 
     describe('Param', () => {
@@ -38,6 +44,18 @@ describe('ParamExtractor', () => {
 
             expect(target.parseInput(input, command)).toStrictEqual(new ParamError('Missing required parameter: par'));
         });
+
+        test('Params should be case-insensitive', () => {
+            const input = 'cmd --PAR 2';
+
+            expect(target.parseInput(input, command)).toHaveProperty('par', 2);
+        });
+
+        test('Params arguments should be case-sensitive', () => {
+            const input = 'cmd --PAR 2 -r AbCdEf';
+
+            expect(target.parseInput(input, command)).toHaveProperty('rap', 'AbCdEf');
+        });
     });
 
     describe('Flag', () => {
@@ -57,6 +75,12 @@ describe('ParamExtractor', () => {
             const input = 'cmd -p 1 -fn';
 
             expect(target.parseInput(input, command)).toStrictEqual({ flag: true, nflag: true, par: 1 });
+        });
+        
+        test('Flags should be case-insensitive', () => {
+            const input = 'CMD --par 2 --FLAG';
+
+            expect(target.parseInput(input, command)).toHaveProperty('flag', true);
         });
     });
 });
