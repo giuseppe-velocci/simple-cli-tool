@@ -1,5 +1,3 @@
-import { EntryPoint } from "./EntryPoint";
-
 const readline = require('readline');
 const rl = readline.createInterface({
     input: process.stdin,
@@ -8,7 +6,7 @@ const rl = readline.createInterface({
 });
 
 export interface ClIO {
-    prompt(action: (input: string) => void): void;
+    readline(action: (input: string) => void): void;
     print(message: string): void;
     error(message: string): void;
 }
@@ -25,10 +23,11 @@ export class ClIOImpl implements ClIO {
         return ClIOImpl.instance;
     }
 
-    prompt(action: (input: string) => void): void {
+    readline(action: (input: string) => void): void {
         rl.question('', (line) => {
             action(line);
-        });
+            rl.close();
+        })
     }
 
     print(message: string): void {

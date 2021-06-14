@@ -23,7 +23,7 @@ export class ClIOTest implements ClIO {
         this.errorValues = [];
     }
 
-    prompt(action: (choice: string) => void): void {
+    readline(action: (choice: string) => void): void {
         const input: string = this.user.inputValues.shift();
         action(input);
     }
@@ -57,24 +57,24 @@ test('ClIOTest error should print error messages passed in order', () => {
     expect(target.errorValues).toStrictEqual(['err 1', 'err 2', 'err 3']);
 });
 
-test('ClIOTest prompt should process user inputs in order', () => {
+test('ClIOTest readline should process user inputs in order', () => {
     const user: User = new User;
     user.willInput(['1', '2', '3']);
     const target = new ClIOTest(user);
     const testAction = (input: string) => target.print(input);
-    target.prompt(testAction);
-    target.prompt(testAction);
-    target.prompt(testAction);    
+    target.readline(testAction);
+    target.readline(testAction);
+    target.readline(testAction);    
 
     expect(target.printedValues).toStrictEqual(['1', '2', '3']);
 });
 
-test('ClIOTest prompt should acquire an undefined if too many values are requested', () => {
+test('ClIOTest readline should acquire an undefined if too many values are requested', () => {
     const user: User = new User;
     user.willInput([]);
     const target = new ClIOTest(user);
     const testAction = (input: string) => target.print(input);
-    target.prompt(testAction);
+    target.readline(testAction);
 
     expect(target.printedValues).toStrictEqual([undefined]);
 });

@@ -24,7 +24,7 @@ export default class EntryPointImpl implements EntryPoint {
 
     start() {
         const handleCommand = this.createCommandHandlerMethod(this);
-        this.io.prompt(handleCommand);
+        this.io.readline(handleCommand);
     }
 
     private createCommandHandlerMethod(instance: EntryPoint): (input: string) => void {

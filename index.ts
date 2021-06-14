@@ -15,7 +15,11 @@ const commands: Array<Command> = [
         new Flag('nighttime', 'n', 'if it is night time'),
     ],
     (params) => {
-        io.print(`Hello ${params.person}`);
+        const { person, nighttime } = params;
+        if (nighttime === true)
+            io.print(`Goodnight ${person}`);
+        else
+            io.print(`Hello ${person}`);
     }
 )
 ];
