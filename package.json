@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "tsc && npx jest",
-    "start": "tsc && node dist/index.js"
+    "start": "tsc && node dist/index.js",
+    "pack": "tsc && pkg dist/index.js --t host --out-path dist/bin"
   },
   "repository": {
     "type": "git",
@@ -27,5 +28,6 @@
     "jest": "^27.0.4",
     "ts-jest": "^27.0.2",
     "typescript": "^4.3.2"
-  }
+  },
+  "dependencies": {}
 }
