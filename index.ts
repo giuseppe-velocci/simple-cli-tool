@@ -20,7 +20,8 @@ const commands: Array<Command> = [
             io.print(`Goodnight ${person}`);
         else
             io.print(`Hello ${person}`);
-    }
+    },
+    'say hello to a specific person at a specific time of the day'
 )
 ];
 

@@ -19,7 +19,8 @@ describe('EntryPointImpl', () => {
                 new Param('person', 'p', PropType.String, PropConstraint.Required, 'person to be greeted'),
                 new Flag('nighttime', 'n', 'if it is night time'),
             ],
-            cmdAction(io)
+            cmdAction(io),
+            'greet a specific person'
         ),
     ];
 
@@ -39,6 +40,42 @@ describe('EntryPointImpl', () => {
         const entryPoint = new EntryPointImpl(commands, io, inputParser);
         entryPoint.start();
         expect(io.printedValues).toStrictEqual(['Hello Io!']);
+    });
+
+    test('should handle --help flag at top level', () => {
+        const user = new User();
+        user.willInput(['--help']);
+        const io = new ClIOTest(user);
+
+        const commands: Array<Command> = getCommands(io);
+
+        const entryPoint = new EntryPointImpl(commands, io, inputParser);
+        entryPoint.start();
+        expect(io.printedValues).toStrictEqual(['Commands:\nGREET      greet a specific person\n']);
+    });
+
+    test('should handle --help flag for a command', () => {
+        const user = new User();
+        user.willInput(['greet --help']);
+        const io = new ClIOTest(user);
+
+        const commands: Array<Command> = getCommands(io);
+
+        const entryPoint = new EntryPointImpl(commands, io, inputParser);
+        entryPoint.start();
+        expect(io.printedValues).toStrictEqual(['GREET     greet a specific person\n\nParameters:\n[String] (Required)  --person | -p     person to be greeted\n\nFlags:\n                     --nighttime | -n     if it is night time\n']);
+    });
+
+    test('should handle -h short help flag for a command', () => {
+        const user = new User();
+        user.willInput(['greet -h']);
+        const io = new ClIOTest(user);
+
+        const commands: Array<Command> = getCommands(io);
+
+        const entryPoint = new EntryPointImpl(commands, io, inputParser);
+        entryPoint.start();
+        expect(io.printedValues).toStrictEqual(['GREET     greet a specific person\n\nParameters:\n[String] (Required)  --person | -p     person to be greeted\n\nFlags:\n                     --nighttime | -n     if it is night time\n']);
     });
 
     test('should print error in output error stream', () => {

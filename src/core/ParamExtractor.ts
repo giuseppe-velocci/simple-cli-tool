@@ -114,6 +114,7 @@ export default class ParamExtractor implements InputParser {
                 case PropType.String:
                     cliArguments[cliParam.name] = value;
                     break;
+                // TODO arrays
             }
         } else if (cliParam instanceof Flag) {
             cliArguments[cliParam.name] = value === 'false' ? false : true;
