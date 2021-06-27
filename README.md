@@ -15,4 +15,12 @@ To create an executable file that targets os of your machine:
 
 The application will be saved in *./dist/bin* folder
 
-or use directly pkg to configure the build that you need
+or use directly pkg to configure the build that you need;
+
+
+
+## ROADMAP:
+- help flag/command to display info over commands
+- change logic for ClIO read to comply with direct usage from a cli
+- allow rename for executable file from an attribute in package.json
+- array values (with types?)

@@ -24,10 +24,16 @@ export class ClIOImpl implements ClIO {
     }
 
     readline(action: (input: string) => void): void {
-        rl.question('', (line) => {
+        if (process.env.NODE_ENV === "development") {
+            rl.question('', (line) => {
+                action(line);
+                rl.close();
+            })
+        } else {
+            const line = process.argv.filter((v, i, d) => i > 1).join(' ');
             action(line);
-            rl.close();
-        })
+            process.exit(0);
+        }
     }
 
     print(message: string): void {

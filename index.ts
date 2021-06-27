@@ -6,7 +6,7 @@ import ParamExtractor from './src/core/ParamExtractor';
 const io = ClIOImpl.getInstance();
 const inputParser = new ParamExtractor();
 
-// test commands, ideally moved to extrenal files
+// test commands, ideally moved to external files
 const commands: Array<Command> = [
     new Command(
     'greet',
