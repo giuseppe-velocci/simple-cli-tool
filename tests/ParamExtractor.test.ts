@@ -10,7 +10,8 @@ const command = new Command(
         new Flag('flag', 'f', 'flag description'),
         new Flag('nflag', 'n', 'nflag description')
     ],
-    ({ params }) => { params; }
+    ({ params }) => { params; },
+    'a test cmd'
 );
 const target = new ParamExtractor();
 

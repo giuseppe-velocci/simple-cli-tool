@@ -2,11 +2,13 @@ export class Command {
     name: string;
     params: Array<CliParam>;
     action: (params: Record<string, any>) => void;
+    description: string;
 
-    constructor(name:string, params: Array<CliParam>, action: (params: Record<string, any>) => void) {
+    constructor(name:string, params: Array<CliParam>, action: (params: Record<string, any>) => void, description: string = '') {
         this.name = name;
         this.params = params;
         this.action = action;
+        this.description = description;
     }
 }
 
