@@ -4,9 +4,9 @@
   "description": "a simple framework to create cli tool to be used globally in a system",
   "main": "index.js",
   "scripts": {
-    "test": "tsc && npx jest",
-    "start": "tsc && node dist/index.js",
-    "pack": "tsc && pkg dist/index.js --t host --out-path dist/bin"
+    "test": "tsc && cross-env NODE_ENV=development npx jest",
+    "start": "tsc && cross-env NODE_ENV=development node dist/index.js",
+    "pack": "tsc && cross-env NODE_ENV=production pkg dist/index.js --t host --out-path dist/bin"
   },
   "repository": {
     "type": "git",
@@ -25,6 +25,7 @@
   "homepage": "https://github.com/giuseppe-velocci/simple-cli-tool#readme",
   "devDependencies": {
     "@types/jest": "^26.0.23",
+    "cross-env": "^7.0.3",
     "jest": "^27.0.4",
     "ts-jest": "^27.0.2",
     "typescript": "^4.3.2"
