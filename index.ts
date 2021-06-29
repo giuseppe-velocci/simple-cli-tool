@@ -2,9 +2,13 @@ import { Command, Flag, Param, PropConstraint, PropType } from './src/core/Comma
 import EntryPoint from './src/core/EntryPoint';
 import { ClIOImpl } from './src/core/ClIO';
 import ParamExtractor from './src/core/ParamExtractor';
+import HelpPrinterImpl from './src/core/HelpPrinter';
+import VersionPrinterImpl from './src/core/VersionPrinter';
 
 const io = ClIOImpl.getInstance();
 const inputParser = new ParamExtractor();
+const helpPrinter = new HelpPrinterImpl(io);
+const versionPrinter = new VersionPrinterImpl(io);
 
 // test commands, ideally moved to external files
 const commands: Array<Command> = [
@@ -25,6 +29,6 @@ const commands: Array<Command> = [
 )
 ];
 
-const entryPoint = new EntryPoint(commands, io, inputParser);
+const entryPoint = new EntryPoint(commands, io, inputParser, helpPrinter, versionPrinter);
 
 entryPoint.start();
