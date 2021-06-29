@@ -24,12 +24,15 @@ Add the filepath to the executable to the PATH env variable of your system, than
  `$ app greet -p Mary`
 
  ## Get help
- If help is needed while typing your commands add `--help` or `-h` flag.
- If done at top level this will print the list of available commands with a short description; if dne after a valid command name it will print the detail for command parameters and flags.
+ If help is needed at top level typing `help` or `-h` will print the list of available commands with a short description.
+ Instead typing `--help` or `-h` flag after a valid command will print the detail for command parameters and flags.
+
+ ## Get version
+To print program version (will be read from *version* argument inside *package.json*) at top level type `version` or `-v`.
 
 ## ROADMAP:
 - [x] help flag/command to display info over commands
 - [x] change logic for ClIO read to comply with direct usage from a cli
-- [ ] version command (flag?)
+- [x] version command (flag?)
 - [ ] allow rename for executable file from an attribute in package.json
 - [ ] array values (with types?)
