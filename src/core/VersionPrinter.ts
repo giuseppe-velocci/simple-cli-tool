@@ -14,9 +14,9 @@ export default class VersionPrinterImpl implements VersionPrinter {
 
     printVersion(): void {
         const packageJson = fs.readFileSync('../package.json', 'utf8');
-        const version = JSON.parse(packageJson).version;
+        const options = JSON.parse(packageJson);
 
-        this.io.print(`version: ${version}`);
+        this.io.print(`${options.name} v${options.version}`);
     }
 
 }

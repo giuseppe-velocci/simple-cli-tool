@@ -6,7 +6,8 @@
   "scripts": {
     "test": "tsc && cross-env NODE_ENV=development npx jest",
     "start": "tsc && cross-env NODE_ENV=development node dist/index.js",
-    "pack": "tsc && cross-env NODE_ENV=production pkg dist/index.js --t host --out-path dist/bin"
+    "pack": "tsc && cross-env NODE_ENV=production pkg dist/index.js --t host --out-path dist/bin && npm run rename-exec-file",
+    "rename-exec-file": "node -e \"require('./rename.js');\""
   },
   "repository": {
     "type": "git",
