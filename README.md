@@ -13,19 +13,14 @@ To create an executable file that targets os of your machine:
 
   `npm run pack`
 
-The application will be saved in *./dist/bin* folder
-
-or use directly pkg to configure the build that you need.
+The application will be saved in *./dist/bin* folder. If needed, `pkg` attribute is already inside *package.json*ready to be further customized and configure the build that you need.
+**Please do not change `outputPath` as it can be a breaking change for other operations.**
 
 ## What will be the name of my command?
 Executable file created by pkg will be named as the entry point of the application, so it will be *index* for current implementation.
 The script *./rename.js* will read `name` property from *package.json* and rename executable file with that value. An npm script is already configured for this task: `rename-exec-file`.
 
-In order to customize this name this is the process applied and suggested:
-- name your node project as the command you would like to run on cli (please NO spaces)
-Then, based on the way used to configure package building process:
-- if using `npm run pack`: no action needed, `rename-exec-file` is run as last action
-- if providing a custom configuratio, ensure to run `npm run rename-exec-file` at the end
+In order to customize your cli command name, assign your node project the same name as the command you would like to run on cli (please NO spaces). Then, `npm run pack` will take care of handling this procedure for you.
 
 ## Run the executable from a terminal in any directory
 Add the filepath to the executable to the PATH env variable of your system, than start a new terminal and input the name of the executable (without extension) followed by commands and optionally parameters for it to run.
@@ -56,7 +51,7 @@ To print program version (will be read from *version* argument inside *package.j
 - [x] change logic for ClIO read to comply with direct usage from a cli
 - [x] version command
 - [x] allow renaming executable file from "name" attribute in package.json
-- [x] quit command
+- [ ] quit command
 - [ ] allow reading required parameters positionally
 - [ ] implement excluding constraint
 - [ ] array values (with types?)
