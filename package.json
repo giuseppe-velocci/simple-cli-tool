@@ -3,10 +3,18 @@
   "version": "1.0.0",
   "description": "a simple framework to create cli tool to be used globally in a system",
   "main": "index.js",
+  "bin": "dist/index.js",
+  "pkg": {
+    "scripts": ["dist/**/*.js"],
+    "assets": [],
+    "targets": ["host"],
+    "outputPath": "dist/bin"
+  },
   "scripts": {
     "test": "tsc && cross-env NODE_ENV=development npx jest",
-    "start": "tsc && cross-env NODE_ENV=development node dist/index.js",
-    "pack": "tsc && cross-env NODE_ENV=production pkg dist/index.js --t host --out-path dist/bin && npm run rename-exec-file",
+    "start": "npm run compile-and-init && cross-env NODE_ENV=development node dist/index.js",
+    "pack": "npm run compile-and-init && cross-env NODE_ENV=production pkg . && npm run rename-exec-file",
+    "compile-and-init": "tsc && node -e \"require('./package-info-to-dist.js');\"",
     "rename-exec-file": "node -e \"require('./rename.js');\""
   },
   "repository": {

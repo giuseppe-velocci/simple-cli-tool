@@ -1,15 +1,11 @@
 // inspired by: https://gist.github.com/hpneo/c4da1ca88e56e6164e36
 const fs = require('fs');
 const path = require('path');
-
-const readAppName = () => {
-    const packageJson = fs.readFileSync('./package.json', 'utf8');
-    return JSON.parse(packageJson).name;
-}
+const packageInfo = require(path.join(__dirname, 'package.json'));
 
 const dir = './dist/bin';
 const match = RegExp('index', 'g');
-const replace = readAppName();
+const replace = packageInfo.name;
 const files = fs.readdirSync(dir);
 
 files.filter(function(file) {

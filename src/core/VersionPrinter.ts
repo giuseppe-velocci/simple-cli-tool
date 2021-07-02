@@ -1,5 +1,16 @@
 import { ClIO } from "./ClIO";
-import * as fs from 'fs';
+
+const getVersionInfo = () => {
+    try {
+        const info = require('../../package-info.js');
+        return info;
+    } catch {
+        const info = require('../../dist/package-info.js');
+        return info;
+    }
+}
+
+const packageInfo = getVersionInfo();
 
 export interface VersionPrinter {
     printVersion(): void;
@@ -13,10 +24,6 @@ export default class VersionPrinterImpl implements VersionPrinter {
     }
 
     printVersion(): void {
-        const packageJson = fs.readFileSync('../package.json', 'utf8');
-        const options = JSON.parse(packageJson);
-
-        this.io.print(`${options.name} v${options.version}`);
+        this.io.print(`${packageInfo.name} v${packageInfo.version}`);
     }
-
 }

@@ -33,6 +33,17 @@ Add the filepath to the executable to the PATH env variable of your system, than
 
  `$ app greet -p Mary`
 
+
+## Run from node
+To run the application from node without publishing an executable:
+- run from a terminal pointing to this project folder:
+
+  `npm run start`
+
+A command prompt will be waiting fr your commands. Plese do keep in mind:
+- input just the command to test, not application name
+- prompt will be closed after each command as for executable
+
  ## Get help
  If help is needed at top level typing `help` or `-h` will print the list of available commands with a short description.
  Instead typing `--help` or `-h` flag after a valid command will print the detail for command parameters and flags.
@@ -43,8 +54,9 @@ To print program version (will be read from *version* argument inside *package.j
 ## ROADMAP:
 - [x] help flag/command to display info over commands
 - [x] change logic for ClIO read to comply with direct usage from a cli
-- [ ] version command (fix case when package.json is not in folder)
+- [x] version command
 - [x] allow renaming executable file from "name" attribute in package.json
+- [x] quit command
 - [ ] allow reading required parameters positionally
 - [ ] implement excluding constraint
 - [ ] array values (with types?)
