@@ -39,6 +39,10 @@ A command prompt will be waiting fr your commands. Plese do keep in mind:
 - input just the command to test, not application name
 - prompt will be closed after each command as for executable
 
+## How to add custom commands?
+There are some sample commands in file *./commands.ts*. They should provide guidance on how to create a list of `Commands`, also specifying `Params` and `Flags` for each of them. 
+For an easy startup just replace the commands inside the array with the new ones (with methods ideally declared in external files).
+
  ## Get help
  If help is needed at top level typing `help` or `-h` will print the list of available commands with a short description.
  Instead typing `--help` or `-h` flag after a valid command will print the detail for command parameters and flags.
