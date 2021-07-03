@@ -13,9 +13,9 @@
   "scripts": {
     "test": "tsc && cross-env NODE_ENV=development npx jest",
     "start": "npm run compile-and-init && cross-env NODE_ENV=development node dist/index.js",
-    "pack": "npm run compile-and-init && cross-env NODE_ENV=production pkg . && npm run rename-exec-file",
-    "compile-and-init": "tsc && node -e \"require('./package-info-to-dist.js');\"",
-    "rename-exec-file": "node -e \"require('./rename.js');\""
+    "build": "npm run compile-and-init && cross-env NODE_ENV=production pkg . && npm run rename-exec-file",
+    "compile-and-init": "tsc && node -e \"require('./build-utils/package-info-to-dist.js');\"",
+    "rename-exec-file": "node -e \"require('./build-utils/rename.js');\""
   },
   "repository": {
     "type": "git",
