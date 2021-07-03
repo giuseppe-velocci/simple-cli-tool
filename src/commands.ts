@@ -1,5 +1,5 @@
-import { ClIOImpl } from "./src/core/ClIO";
-import { Command, Flag, Param, PropConstraint, PropType } from "./src/core/CommandModels";
+import { ClIOImpl } from "./core/ClIO";
+import { Command, Flag, Param, PropConstraint, PropType } from "./core/CommandModels";
 
 const io = ClIOImpl.getInstance();
 

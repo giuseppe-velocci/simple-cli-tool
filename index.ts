@@ -4,7 +4,7 @@ import { ClIOImpl } from './src/core/ClIO';
 import ParamExtractor from './src/core/ParamExtractor';
 import HelpPrinterImpl from './src/core/HelpPrinter';
 import VersionPrinterImpl from './src/core/VersionPrinter';
-import { commands } from './commands';
+import { commands } from './src/commands';
 
 const io = ClIOImpl.getInstance();
 const inputParser = new ParamExtractor();
