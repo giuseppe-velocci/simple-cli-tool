@@ -1,6 +1,10 @@
 import { ClIO } from "./ClIO";
+import VersionInfo from "./VersionInfo";
 
-const getVersionInfo = () => {
+const getVersionInfo = (injectedInfo: VersionInfo) => {
+    if (injectedInfo.name && injectedInfo.version)
+        return injectedInfo;
+
     try {
         const info = require('../../package-info.js');
         return info;
@@ -10,20 +14,20 @@ const getVersionInfo = () => {
     }
 }
 
-const packageInfo = getVersionInfo();
-
 export interface VersionPrinter {
     printVersion(): void;
 }
 
 export default class VersionPrinterImpl implements VersionPrinter {
     io: ClIO;
+    packageInfo: VersionInfo;
 
-    constructor(io: ClIO) {
+    constructor(io: ClIO, injectedInfo: VersionInfo = new VersionInfo('', '')) {
        this.io = io;
+       this.packageInfo = getVersionInfo(injectedInfo)
     }
 
     printVersion(): void {
-        this.io.print(`${packageInfo.name} v${packageInfo.version}`);
+        this.io.print(`${this.packageInfo.name} v${this.packageInfo.version}`);
     }
 }
