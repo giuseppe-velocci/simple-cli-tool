@@ -1,7 +1,7 @@
 import { ClIO } from '../src/core/ClIO';
 import { Command, Flag, Param, PropConstraint, PropType } from '../src/core/CommandModels';
 import EntryPointImpl from '../src/core/EntryPoint';
-import HelpPrinterImpl, { HelpPrinter } from '../src/core/HelpPrinter';
+import { HelpPrinter } from '../src/core/HelpPrinter';
 import ParamError from '../src/core/ParamError';
 import { Either, InputParser } from '../src/core/ParamExtractor';
 import { VersionPrinter } from '../src/core/VersionPrinter';
