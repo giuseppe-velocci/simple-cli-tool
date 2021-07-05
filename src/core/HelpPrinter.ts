@@ -1,25 +1,30 @@
 import { ClIO } from "./ClIO";
-import { CliParam, Command, Flag, Param, PropConstraint, PropType } from "./CommandModels";
-import EntryPoint from "./EntryPoint";
+import { CliParam, Command, Flag, Param, PropConstraint, PropType } from "./models/CommandModels";
 
 const minLineSpace = 21;
 
-export interface HelpPrinter {
-    printHelpForCommands(commands: Command[]): void;
+export interface CommandHelpPrinter {
     isHelpRequestedForSpecificCommand(input: string): boolean;
     printHelpForSpecificCommand(command: Command): void;
 }
 
-export default class HelpPrinterImpl implements HelpPrinter {
-    io: ClIO;
+export interface HelpPrinter {
+    printHelpForCommands(commands: Command[]): void;
 
-    constructor(io: ClIO) {
+}
+
+export default class HelpPrinterImpl implements HelpPrinter, CommandHelpPrinter {
+    io: ClIO;
+    commands: Array<Command>;
+
+    constructor(io: ClIO, commands: Array<Command>) {
         this.io = io;
+        this.commands = commands;
     }
 
-    printHelpForCommands(commands: Command[]): void {
+    printHelpForCommands(): void {
         let commandsDescription = 'Commands:\n';
-        commands.map(x => {
+        this.commands.map(x => {
             commandsDescription += `${x.name.toUpperCase()}`;
             if (commandsDescription.length < minLineSpace)
                 commandsDescription += ' '.repeat(minLineSpace - commandsDescription.length);

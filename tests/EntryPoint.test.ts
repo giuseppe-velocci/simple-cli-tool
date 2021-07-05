@@ -1,10 +1,9 @@
 import { ClIO } from '../src/core/ClIO';
-import { Command, Flag, Param, PropConstraint, PropType } from '../src/core/CommandModels';
+import { Command, Flag, Param, PropConstraint, PropType } from '../src/core/models/CommandModels';
 import EntryPointImpl from '../src/core/EntryPoint';
-import { HelpPrinter } from '../src/core/HelpPrinter';
-import ParamError from '../src/core/ParamError';
+import { CommandHelpPrinter } from '../src/core/HelpPrinter';
+import ParamError from '../src/core/models/ParamError';
 import { Either, InputParser } from '../src/core/ParamExtractor';
-import { VersionPrinter } from '../src/core/VersionPrinter';
 import { ClIOTest, User } from './ClIO.test';
 
 describe('EntryPointImpl', () => {
@@ -30,8 +29,8 @@ describe('EntryPointImpl', () => {
         const commands: Array<Command> = getCommands(io);
         const inputParser = new InputParserTest();
         const helpPrinter = new HelpPrinterTest(io);
-        const versionPrinter = new VersionPrinterTest(io);
-        return new EntryPointImpl(commands, io, inputParser, helpPrinter, versionPrinter);
+        const builtInCommands = [new Command('custom', [], (_) => io.print('custom'))];
+        return new EntryPointImpl(commands, io, inputParser, helpPrinter, builtInCommands);
     }
 
     test('should handle command', () => {
@@ -44,44 +43,14 @@ describe('EntryPointImpl', () => {
         expect(io.printedValues).toStrictEqual(['Hello Io!']);
     });
 
-    test('should handle version command', () => {
+    test('should handle a built in command', () => {
         const user = new User();
-        user.willInput(['version']);
+        user.willInput(['custom']);
         const io = new ClIOTest(user);
         const entryPoint = getEntryPoint(io);
 
         entryPoint.start();
-        expect(io.printedValues).toStrictEqual(['1.0.0']);
-    });
-
-    test('should handle version short command', () => {
-        const user = new User();
-        user.willInput(['-v']);
-        const io = new ClIOTest(user);
-        const entryPoint = getEntryPoint(io);
-
-        entryPoint.start();
-        expect(io.printedValues).toStrictEqual(['1.0.0']);
-    });
-
-    test('should handle help command at top level', () => {
-        const user = new User();
-        user.willInput(['help']);
-        const io = new ClIOTest(user);
-        const entryPoint = getEntryPoint(io);
-
-        entryPoint.start();
-        expect(io.printedValues).toStrictEqual(['Commands:\nGREET      greet a specific person\n']);
-    });
-
-    test('should handle help short command at top level', () => {
-        const user = new User();
-        user.willInput(['-h']);
-        const io = new ClIOTest(user);
-        const entryPoint = getEntryPoint(io);
-
-        entryPoint.start();
-        expect(io.printedValues).toStrictEqual(['Commands:\nGREET      greet a specific person\n']);
+        expect(io.printedValues).toStrictEqual(['custom']);
     });
 
     test('should handle --help flag for a command', () => {
@@ -124,15 +93,11 @@ class InputParserTest implements InputParser {
     }
 }
 
-class HelpPrinterTest implements HelpPrinter {
+class HelpPrinterTest implements CommandHelpPrinter {
     io: ClIO;
 
     constructor(io: ClIO) {
         this.io = io;
-    }
-
-    printHelpForCommands(commands: Command[]): void {
-        this.io.print('Commands:\nGREET      greet a specific person\n');
     }
 
     isHelpRequestedForSpecificCommand(input: string): boolean {
@@ -145,17 +110,4 @@ class HelpPrinterTest implements HelpPrinter {
     printHelpForSpecificCommand(command: Command): void {
         this.io.print('GREET     greet a specific person\n\nParameters:\n[String] (Required)  --person | -p     person to be greeted\n\nFlags:\n                     --nighttime | -n     if it is night time\n');
     }
-}
-
-class VersionPrinterTest implements VersionPrinter {
-    io: ClIO;
-
-    constructor(io: ClIO) {
-        this.io = io;
-    }
-
-    printVersion(): void {
-        this.io.print('1.0.0');
-    }
-    
 }
