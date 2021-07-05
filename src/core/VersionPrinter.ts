@@ -1,5 +1,5 @@
 import { ClIO } from "./ClIO";
-import VersionInfo from "./VersionInfo";
+import VersionInfo from "./models/VersionInfo";
 
 const getVersionInfo = (injectedInfo: VersionInfo) => {
     if (injectedInfo.name && injectedInfo.version)

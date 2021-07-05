@@ -1,9 +1,8 @@
 import { ClIO } from "./ClIO"
-import { Command } from "./CommandModels"
+import { Command } from "./models/CommandModels"
 import { InputParser } from "./ParamExtractor";
-import ParamError from "./ParamError";
-import { HelpPrinter } from "./HelpPrinter";
-import { VersionPrinter } from "./VersionPrinter";
+import ParamError from "./models/ParamError";
+import { CommandHelpPrinter } from "./HelpPrinter";
 
 export interface EntryPoint {
     commands: Array<Command>;
@@ -17,21 +16,21 @@ export default class EntryPointImpl implements EntryPoint {
     commands: Array<Command>;
     io: ClIO;
     inputParser: InputParser;
-    helpPrinter: HelpPrinter;
-    versionPrinter: VersionPrinter;
+    helpPrinter: CommandHelpPrinter;
+    builtInCommands: Array<Command>
 
     constructor(
         commands: Array<Command>,
         io: ClIO,
         inputParser: InputParser,
-        helpPrinter: HelpPrinter,
-        versionPrinter: VersionPrinter,
+        helpPrinter: CommandHelpPrinter,
+        builtInCommands: Array<Command> = [],
     ) {
         this.commands = commands;
         this.io = io;
         this.inputParser = inputParser;
         this.helpPrinter = helpPrinter;
-        this.versionPrinter = versionPrinter;
+        this.builtInCommands = builtInCommands;
     }
 
     start() {
@@ -41,21 +40,13 @@ export default class EntryPointImpl implements EntryPoint {
 
     private createCommandHandlerMethod(instance: EntryPoint): (input: string) => void {
         return (input: string) => {
-            const cmdInput = input.trim().toLowerCase().split(' ')[0]; // TODO should be in position 0 or 1???
+            const extendedCommands = instance.commands.concat(this.builtInCommands)
+
+            const cmdInput = input.trim().toLowerCase().split(' ')[0];
             if (!cmdInput)
                 instance.io.error('invalid input');
 
-            if (cmdInput === 'help' || cmdInput === '-h') {
-                this.helpPrinter.printHelpForCommands(instance.commands);
-                return;
-            }
-
-            if (cmdInput === 'version' || cmdInput === '-v') {
-                this.versionPrinter.printVersion();
-                return;
-            }
-
-            const cmd = instance.commands.find(c => c.name == cmdInput);
+            const cmd = extendedCommands.find(c => c.name == cmdInput);
             if (!cmd)
                 instance.io.error('command not found');
 

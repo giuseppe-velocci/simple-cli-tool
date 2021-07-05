@@ -1,5 +1,5 @@
-import { Command, CliParam, Param, Flag, PropType, PropConstraint } from "./CommandModels";
-import ParamError from "./ParamError";
+import { Command, CliParam, Param, Flag, PropType, PropConstraint } from "./models/CommandModels";
+import ParamError from "./models/ParamError";
 
 export type Either<L, R> = L | R;
 

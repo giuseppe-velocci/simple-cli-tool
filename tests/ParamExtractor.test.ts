@@ -1,6 +1,6 @@
-import { Command, Flag, Param, PropType, PropConstraint } from '../src/core/CommandModels';
+import { Command, Flag, Param, PropType, PropConstraint } from '../src/core/models/CommandModels';
 import ParamExtractor from '../src/core/ParamExtractor';
-import ParamError from '../src/core/ParamError';
+import ParamError from '../src/core/models/ParamError';
 
 const command = new Command(
     'cmd',
