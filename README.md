@@ -43,6 +43,29 @@ A command prompt will be waiting fr your commands. Plese do keep in mind:
 There are some sample commands in file *./src/commands.ts*. They should provide guidance on how to create a list of `Commands`, also specifying `Params` and `Flags` for each of them. 
 For an easy startup just replace the commands inside the array with the new ones (with methods ideally declared in external files).
 
+Example of commands declaration:
+```typescript
+const io = ClIOImpl.getInstance();
+
+const commands: Array<Command> = [
+    new Command(
+    'greet',
+    [
+        new Param('person', 'p', PropType.String, PropConstraint.Required, 'person to be greeted'),
+        new Flag('nighttime', 'n', 'if it is night time'),
+    ],
+    (params) => {
+        const { person, nighttime } = params;
+        if (nighttime === true)
+            io.print(`Goodnight ${person}`);
+        else
+            io.print(`Hello ${person}`);
+    },
+    'say hello to a specific person at a specific time of the day'
+  )
+];
+```
+
  ## Get help
  If help is needed at top level typing `help` will print the list of available commands with a short description.
  Instead typing `--help` or `-h` flag after a valid command will print the detail for command parameters and flags.
