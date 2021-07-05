@@ -44,11 +44,11 @@ There are some sample commands in file *./src/commands.ts*. They should provide 
 For an easy startup just replace the commands inside the array with the new ones (with methods ideally declared in external files).
 
  ## Get help
- If help is needed at top level typing `help` or `-h` will print the list of available commands with a short description.
+ If help is needed at top level typing `help` will print the list of available commands with a short description.
  Instead typing `--help` or `-h` flag after a valid command will print the detail for command parameters and flags.
 
  ## Get version
-To print program version (will be read from *version* argument inside *package.json*) at top level type `version` or `-v`.
+To print program version (will be read from *version* argument inside *package.json*) at top level type `version`.
 
 ## ROADMAP:
 - [x] help flag/command to display info over commands
