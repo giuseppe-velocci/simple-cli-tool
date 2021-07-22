@@ -38,11 +38,11 @@ export default class EntryPointImpl implements EntryPoint {
         this.io.readline(handleCommand);
     }
 
-    private createCommandHandlerMethod(instance: EntryPoint): (input: string) => void {
-        return (input: string) => {
+    private createCommandHandlerMethod(instance: EntryPoint): (input: Array<string>) => void {
+        return (input: Array<string>) => {
             const extendedCommands = instance.commands.concat(this.builtInCommands)
 
-            const cmdInput = input.trim().toLowerCase().split(' ')[0];
+            const cmdInput = !!input && input[0] ? input[0].toLowerCase() : undefined;
             if (!cmdInput)
                 instance.io.error('invalid input');
 
@@ -54,8 +54,9 @@ export default class EntryPointImpl implements EntryPoint {
                 this.helpPrinter.printHelpForSpecificCommand(cmd);
                 return;
             }
+            const inputWithoutCommand = input.splice(0, 1);
 
-            const paramsOrError = instance.inputParser.parseInput(input, cmd);
+            const paramsOrError = instance.inputParser.parseInput(inputWithoutCommand, cmd);
             if (paramsOrError instanceof ParamError)
                 instance.io.error(paramsOrError.message);
 

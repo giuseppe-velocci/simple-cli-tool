@@ -4,7 +4,7 @@ import ParamError from "./models/ParamError";
 export type Either<L, R> = L | R;
 
 export interface InputParser {
-    parseInput(input: string, command: Command): Either<ParamError, Record<string, any>>
+    parseInput(input: Array<string>, command: Command): Either<ParamError, Record<string, any>>
 }
 
 export default class ParamExtractor implements InputParser {
@@ -19,11 +19,11 @@ export default class ParamExtractor implements InputParser {
     }
 
     // command is matched by another method: this one only handles param extraction
-    parseInput(input: string, command: Command): Either<ParamError, Record<string, any>> {
+    parseInput(input: Array<string>, command: Command): Either<ParamError, Record<string, any>> {
         const cliArguments = {};
 
-        const splitInput: Array<string> = this.normalizeInput(input, command);
-        const matchError = splitInput.map(x => this.findAndStoreParam(command, cliArguments, x));
+        // const splitInput: Array<string> = this.normalizeInput(input, command);
+        const matchError = input.map(x => this.findAndStoreParam(command, cliArguments, x));
         if (matchError[0])
             return matchError[0];
 

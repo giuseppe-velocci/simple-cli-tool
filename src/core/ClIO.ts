@@ -6,7 +6,7 @@ const rl = readline.createInterface({
 });
 
 export interface ClIO {
-    readline(action: (input: string) => void): void;
+    readline(action: (input: Array<string>) => void): void;
     print(message: string): void;
     error(message: string): void;
 }
@@ -23,15 +23,15 @@ export class ClIOImpl implements ClIO {
         return ClIOImpl.instance;
     }
 
-    readline(action: (input: string) => void): void {
+    readline(action: (input: Array<string>) => void): void {
         if (process.env.NODE_ENV === "development") {
             rl.question('', (line) => {
-                action(line);
+                action(line.split(' '));
                 rl.close();
             })
         } else {
-            const line = process.argv.filter((v, i, d) => i > 1).join(' ');
-            action(line);
+            const args = process.argv.filter((v, i, d) => i > 1);
+            action(args);
             process.exit(0);
         }
     }
