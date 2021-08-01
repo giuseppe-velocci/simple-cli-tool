@@ -80,7 +80,6 @@ To print program version (will be read from *version* argument inside *package.j
 - [x] change logic for ClIO read to comply with direct usage from a cli
 - [x] version command
 - [x] allow renaming executable file from "name" attribute in package.json
-- [ ] quit command
 - [ ] allow reading required parameters positionally
 - [ ] implement excluding constraint
 - [ ] array values (with types?)

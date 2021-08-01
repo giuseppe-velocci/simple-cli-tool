@@ -8,13 +8,10 @@ export interface InputParser {
 }
 
 export default class ParamExtractor implements InputParser {
-
-    // command is matched by another method: this one only handles param extraction
     parseInput(input: Array<string>, command: Command): Either<ParamError, Record<string, any>> {
         const cliArguments = {};
         console.log(input);
 
-        // const splitInput: Array<string> = this.normalizeInput(input, command);
         const matchError = this.findAndStoreParam(input, command, cliArguments);
         if (matchError)
             return matchError;
@@ -45,12 +42,12 @@ export default class ParamExtractor implements InputParser {
             );
         }
 
-        const increaseIndexConditional = (cliParam: CliParam, index: number) : number => {
+        const increaseIndexConditional = (cliParam: CliParam, index: number): number => {
             if (cliParam instanceof Flag) {
                 return index;
             }
-            return index +1;
-        }  
+            return index + 1;
+        }
 
         // todo --> ensure no duplicated values are allowed!
         while (i < inputCount) {
