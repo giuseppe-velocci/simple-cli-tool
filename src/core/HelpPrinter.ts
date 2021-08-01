@@ -4,7 +4,7 @@ import { CliParam, Command, Flag, Param, PropConstraint, PropType } from "./mode
 const minLineSpace = 21;
 
 export interface CommandHelpPrinter {
-    isHelpRequestedForSpecificCommand(input: string): boolean;
+    isHelpRequestedForSpecificCommand(input: Array<string>): boolean;
     printHelpForSpecificCommand(command: Command): void;
 }
 
@@ -35,7 +35,7 @@ export default class HelpPrinterImpl implements HelpPrinter, CommandHelpPrinter 
         this.io.print(commandsDescription);
     }
 
-    isHelpRequestedForSpecificCommand(input: string): boolean {
+    isHelpRequestedForSpecificCommand(input: Array<string>): boolean {
         if (!input.includes('--help') && !input.includes('-h'))
             return false;
 
@@ -83,8 +83,15 @@ export default class HelpPrinterImpl implements HelpPrinter, CommandHelpPrinter 
         return commandDescription;
     }
 
-    private getParamNameAndDescription(x: CliParam): string {
-        const text = '\n' + x.shortName ? `--${x.name} | -${x.shortName}` : `--${x.name}`;
-        return text + `     ${x.description}\n`;
+    private getParamNameAndDescription(param: CliParam): string {
+        const getParamsText = (x: CliParam) => {
+            if (x instanceof Flag)
+                return '\n' + x.shortName ? `--${x.name} | -${x.shortName}` : `--${x.name}`;
+                
+            return  '\n' + x.shortName ? `${x.name} | -${x.shortName}` : `${x.name}`;
+        };
+
+        const text = getParamsText(param);
+        return text + `     ${param.description}\n`;
     }
 }

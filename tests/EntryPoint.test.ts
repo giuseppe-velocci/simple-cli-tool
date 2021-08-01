@@ -85,7 +85,7 @@ describe('EntryPointImpl', () => {
 });
 
 class InputParserTest implements InputParser {
-    parseInput(input: string, command: Command): Either<ParamError, Record<string, any>> {
+    parseInput(input: Array<string>, command: Command): Either<ParamError, Record<string, any>> {
         if (input.indexOf('--person') < 0 || input.indexOf('-p') < 0)
             return new ParamError('Missing required parameter: person');
 
@@ -100,7 +100,7 @@ class HelpPrinterTest implements CommandHelpPrinter {
         this.io = io;
     }
 
-    isHelpRequestedForSpecificCommand(input: string): boolean {
+    isHelpRequestedForSpecificCommand(input: Array<string>): boolean {
         if (!input.includes('--help') && !input.includes('-h'))
             return false;
 

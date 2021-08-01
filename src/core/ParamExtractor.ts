@@ -4,28 +4,20 @@ import ParamError from "./models/ParamError";
 export type Either<L, R> = L | R;
 
 export interface InputParser {
-    parseInput(input: string, command: Command): Either<ParamError, Record<string, any>>
+    parseInput(input: Array<string>, command: Command): Either<ParamError, Record<string, any>>
 }
 
 export default class ParamExtractor implements InputParser {
-    argsInputDelimiter: string = '-';
-    argsSplitDelimiter: string = '_';
-    argsFullNameInputDelimiter: string;
-    argsFullNameSplitDelimiter: string;
-
-    constructor() {
-        this.argsFullNameInputDelimiter = this.argsInputDelimiter.repeat(2);
-        this.argsFullNameSplitDelimiter = this.argsInputDelimiter + this.argsSplitDelimiter;
-    }
 
     // command is matched by another method: this one only handles param extraction
-    parseInput(input: string, command: Command): Either<ParamError, Record<string, any>> {
+    parseInput(input: Array<string>, command: Command): Either<ParamError, Record<string, any>> {
         const cliArguments = {};
+        console.log(input);
 
-        const splitInput: Array<string> = this.normalizeInput(input, command);
-        const matchError = splitInput.map(x => this.findAndStoreParam(command, cliArguments, x));
-        if (matchError[0])
-            return matchError[0];
+        // const splitInput: Array<string> = this.normalizeInput(input, command);
+        const matchError = this.findAndStoreParam(input, command, cliArguments);
+        if (matchError)
+            return matchError;
 
         // add missing flags as false
         this.storeFlagsDefaultValue(command, cliArguments);
@@ -38,38 +30,44 @@ export default class ParamExtractor implements InputParser {
         return cliArguments;
     }
 
-    private normalizeInput(input: string, command: Command): Array<string> {
-        return input.replace(RegExp(command.name, 'i'), '')
-            .trim()
-            .replace(this.argsFullNameInputDelimiter, this.argsFullNameSplitDelimiter)
-            .split(this.argsInputDelimiter)
-            .filter(x => x !== '');
-    }
+    private findAndStoreParam(input: Array<string>, command: Command, cliArguments: Record<string, any>): ParamError {
+        const inputCount = input.length;
+        let i = 0;
 
-    private findAndStoreParam(command: Command, cliArguments: Record<string, any>, segment: string): ParamError {
-        const [param, value] = segment.trim().split(' ');
-
-        // match by extended or short name
-        const paramString = (
-            (param.charAt(0) === this.argsSplitDelimiter) ?
-                param.substring(1) :
-                param
-        ).toLowerCase();
-
-        const matchingFunction = (param.charAt(0) === this.argsSplitDelimiter) ?
-            ((x: CliParam) => x.name === paramString) :
-            ((x: CliParam) => x.shortName === paramString);
-
-        const paramObject = command.params.find(matchingFunction);
-        if (!paramObject) {
-            // search for chained flags, if not found return error
-            const chainedFlagError = this.findChainedFlags(command, cliArguments, paramString);
-            if (chainedFlagError)
-                return chainedFlagError;
+        const findParamAtIndex = (index: number): CliParam => {
+            const normalizedInput = input[index].toLowerCase();
+            return command.params.find(x =>
+                x.name == normalizedInput
+                || `-${x.shortName}` == normalizedInput
+                || (
+                    `--${x.name}` == normalizedInput && x instanceof Flag
+                )
+            );
         }
 
-        this.storeArguments(cliArguments, paramObject, value);
-        return undefined;
+        const increaseIndexConditional = (cliParam: CliParam, index: number) : number => {
+            if (cliParam instanceof Flag) {
+                return index;
+            }
+            return index +1;
+        }  
+
+        // todo --> ensure no duplicated values are allowed!
+        while (i < inputCount) {
+            let cliParamOption = findParamAtIndex(i);
+            if (cliParamOption) {
+                i = increaseIndexConditional(cliParamOption, i);
+                this.storeArguments(cliArguments, cliParamOption, input[i]);
+
+            } else {
+                const errorOption = this.storeChainedFlags(command, cliArguments, input[i]);
+                if (errorOption)
+                    return errorOption;
+            }
+            i++;
+        }
+
+        return;
     };
 
     private findMissingRequiredParams(command: Command, cliArguments: Record<string, any>): ParamError {
@@ -81,13 +79,14 @@ export default class ParamExtractor implements InputParser {
         return undefined;
     }
 
-    private findChainedFlags(command: Command, cliArguments: Record<string, any>, paramString: string): ParamError {
-        let unhandledInput: string = paramString;
+    private storeChainedFlags(command: Command, cliArguments: Record<string, any>, paramString: string): ParamError {
+        let unhandledInput: string = paramString.replace('-', '');
         const flagsWithShortName = command.params
             .filter(x => x instanceof Flag && x.shortName.length > 0);
 
         flagsWithShortName.map(x => {
             unhandledInput = unhandledInput.replace(x.shortName, '');
+            console.log(unhandledInput, x.shortName);
             this.storeArguments(cliArguments, x);
         });
 

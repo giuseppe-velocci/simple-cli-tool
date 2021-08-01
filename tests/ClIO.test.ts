@@ -23,8 +23,10 @@ export class ClIOTest implements ClIO {
         this.errorValues = [];
     }
 
-    readline(action: (choice: string) => void): void {
-        const input: string = this.user.inputValues.shift();
+    readline(action: (choice: Array<string>) => void): void {
+        const input: Array<string> = this.user.inputValues.length > 0 ?
+            this.user.inputValues.shift().split(' ') :
+            [];
         action(input);
     }
 
@@ -61,7 +63,7 @@ test('ClIOTest readline should process user inputs in order', () => {
     const user: User = new User;
     user.willInput(['1', '2', '3']);
     const target = new ClIOTest(user);
-    const testAction = (input: string) => target.print(input);
+    const testAction = (input: Array<string>) => target.print(input[0]);
     target.readline(testAction);
     target.readline(testAction);
     target.readline(testAction);    
@@ -73,7 +75,7 @@ test('ClIOTest readline should acquire an undefined if too many values are reque
     const user: User = new User;
     user.willInput([]);
     const target = new ClIOTest(user);
-    const testAction = (input: string) => target.print(input);
+    const testAction = (input: Array<string>) => target.print(input[0]);
     target.readline(testAction);
 
     expect(target.printedValues).toStrictEqual([undefined]);

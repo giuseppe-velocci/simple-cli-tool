@@ -17,43 +17,37 @@ const target = new ParamExtractor();
 
 describe('ParamExtractor', () => {
     test('should return an error if an invalid parameter is passed', () => {
-        const input = 'cmd --non_exisiting';
+        const input = 'non_exisiting'.split(' ');
         expect(target.parseInput(input, command)).toStrictEqual(new ParamError('Invalid parameter non_exisiting'));
-    });
-
-    test('Command should be case-insensitive', () => {
-        const input = 'CMD -p 2';
-
-        expect(target.parseInput(input, command)).toHaveProperty('par', 2);
     });
 
     describe('Param', () => {
         test('should return params with correct type for full name', () => {
-            const input = 'cmd --par 2';
+            const input = 'par 2'.split(' ');
 
             expect(target.parseInput(input, command)).toHaveProperty('par', 2);
         });
 
         test('should return params with correct type for short name', () => {
-            const input = 'cmd -p 2';
+            const input = '-p 2'.split(' ');
 
             expect(target.parseInput(input, command)).toHaveProperty('par', 2);
         });
 
         test('Param required constraint should be handled', () => {
-            const input = 'cmd -r 2';
+            const input = '-r 2'.split(' ');
 
             expect(target.parseInput(input, command)).toStrictEqual(new ParamError('Missing required parameter: par'));
         });
 
         test('Params should be case-insensitive', () => {
-            const input = 'cmd --PAR 2';
+            const input = 'PAR 2'.split(' ');
 
             expect(target.parseInput(input, command)).toHaveProperty('par', 2);
         });
 
         test('Params arguments should be case-sensitive', () => {
-            const input = 'cmd --PAR 2 -r AbCdEf';
+            const input = 'PAR 2 -r AbCdEf'.split(' ');
 
             expect(target.parseInput(input, command)).toHaveProperty('rap', 'AbCdEf');
         });
@@ -61,27 +55,34 @@ describe('ParamExtractor', () => {
 
     describe('Flag', () => {
         test('should return flags with a boolean value (false if not passed, true otherwise)', () => {
-            const input = 'cmd --flag -p 2';
+            const input = '--flag -p 2'.split(' ');
 
             expect(target.parseInput(input, command)).toHaveProperty('flag', true);
         });
 
         test('Flags should always be optional', () => {
-            const input = 'cmd -p 2';
+            const input = '-p 2'.split(' ');
 
             expect(target.parseInput(input, command)).toStrictEqual({ flag: false, nflag: false, par: 2 });
         });
 
         test('Flags should be chainable in one single flag', () => {
-            const input = 'cmd -p 1 -fn';
+            const input = '-p 1 -fn'.split(' ');
 
             expect(target.parseInput(input, command)).toStrictEqual({ flag: true, nflag: true, par: 1 });
         });
         
         test('Flags should be case-insensitive', () => {
-            const input = 'CMD --par 2 --FLAG';
+            const input = 'par 2 --FLAG'.split(' ');
 
             expect(target.parseInput(input, command)).toHaveProperty('flag', true);
+        });
+        
+        test('Flags order over params should not change result', () => {
+            const input = '--flag par 2 '.split(' ');
+
+            expect(target.parseInput(input, command)).toHaveProperty('flag', true);
+            expect(target.parseInput(input, command)).toHaveProperty('par', 2);
         });
     });
 });
