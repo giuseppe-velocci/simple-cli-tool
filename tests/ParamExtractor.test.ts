@@ -71,13 +71,13 @@ describe('ParamExtractor', () => {
 
             expect(target.parseInput(input, command)).toStrictEqual({ flag: true, nflag: true, par: 1 });
         });
-        
+
         test('Flags should be case-insensitive', () => {
             const input = 'par 2 --FLAG'.split(' ');
 
             expect(target.parseInput(input, command)).toHaveProperty('flag', true);
         });
-        
+
         test('Flags order over params should not change result', () => {
             const input = '--flag par 2 '.split(' ');
 
