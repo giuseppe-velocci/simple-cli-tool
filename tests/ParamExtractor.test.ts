@@ -72,10 +72,15 @@ describe('ParamExtractor', () => {
                 'a test cmd'
             );
             const input = '2 AbCdEf -f'.split(' ');
+            const input1 = '-r AbCdEf 2 -f'.split(' ');
 
             expect(target.parseInput(input, commandWith2Required)).toHaveProperty('par', 2);
             expect(target.parseInput(input, commandWith2Required)).toHaveProperty('rap', 'AbCdEf');
             expect(target.parseInput(input, commandWith2Required)).toHaveProperty('flag', true);
+
+            expect(target.parseInput(input1, commandWith2Required)).toHaveProperty('par', 2);
+            expect(target.parseInput(input1, commandWith2Required)).toHaveProperty('rap', 'AbCdEf');
+            expect(target.parseInput(input1, commandWith2Required)).toHaveProperty('flag', true);
         });
 
         test('Params duplication should return an error', () => {
