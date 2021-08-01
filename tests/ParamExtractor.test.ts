@@ -17,13 +17,13 @@ const target = new ParamExtractor();
 
 describe('ParamExtractor', () => {
     test('should return an error if an invalid parameter is passed', () => {
-        const input = '--non_exisiting'.split(' ');
+        const input = 'non_exisiting'.split(' ');
         expect(target.parseInput(input, command)).toStrictEqual(new ParamError('Invalid parameter non_exisiting'));
     });
 
     describe('Param', () => {
         test('should return params with correct type for full name', () => {
-            const input = '--par 2'.split(' ');
+            const input = 'par 2'.split(' ');
 
             expect(target.parseInput(input, command)).toHaveProperty('par', 2);
         });
@@ -41,13 +41,13 @@ describe('ParamExtractor', () => {
         });
 
         test('Params should be case-insensitive', () => {
-            const input = '--PAR 2'.split(' ');
+            const input = 'PAR 2'.split(' ');
 
             expect(target.parseInput(input, command)).toHaveProperty('par', 2);
         });
 
         test('Params arguments should be case-sensitive', () => {
-            const input = '--PAR 2 -r AbCdEf'.split(' ');
+            const input = 'PAR 2 -r AbCdEf'.split(' ');
 
             expect(target.parseInput(input, command)).toHaveProperty('rap', 'AbCdEf');
         });
@@ -73,7 +73,7 @@ describe('ParamExtractor', () => {
         });
         
         test('Flags should be case-insensitive', () => {
-            const input = '--par 2 --FLAG'.split(' ');
+            const input = 'par 2 --FLAG'.split(' ');
 
             expect(target.parseInput(input, command)).toHaveProperty('flag', true);
         });
