@@ -77,5 +77,12 @@ describe('ParamExtractor', () => {
 
             expect(target.parseInput(input, command)).toHaveProperty('flag', true);
         });
+        
+        test('Flags order over params should not change result', () => {
+            const input = '--flag par 2 '.split(' ');
+
+            expect(target.parseInput(input, command)).toHaveProperty('flag', true);
+            expect(target.parseInput(input, command)).toHaveProperty('par', 2);
+        });
     });
 });

@@ -54,7 +54,7 @@ export default class EntryPointImpl implements EntryPoint {
                 this.helpPrinter.printHelpForSpecificCommand(cmd);
                 return;
             }
-            const inputWithoutCommand = input.splice(0, 1);
+            const inputWithoutCommand = input.slice(1);
 
             const paramsOrError = instance.inputParser.parseInput(inputWithoutCommand, cmd);
             if (paramsOrError instanceof ParamError)
