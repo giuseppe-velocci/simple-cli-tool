@@ -25,10 +25,16 @@ In order to customize your cli command name, assign your node project the same n
 ## Run the executable from a terminal in any directory
 Add the filepath to the executable to the PATH env variable of your system, than start a new terminal and input the name of the executable (without extension) followed by commands and optionally parameters for it to run.
  Example with param full name version and full name flag:
+
  `$ app greet person Mary --nighttime`
 
  Example with param short version and short name flag:
+ 
  `$ app greet -p Mary -n`
+
+ Example with required param passed positionally and short flag:
+
+ `$ app greet Mary -n`
 
 
 ## Run from node
@@ -80,6 +86,6 @@ To print program version (will be read from *version* argument inside *package.j
 - [x] change logic for ClIO read to comply with direct usage from a cli
 - [x] version command
 - [x] allow renaming executable file from "name" attribute in package.json
-- [ ] allow reading required parameters positionally
+- [x] allow reading required parameters positionally
 - [ ] implement excluding constraint
 - [ ] array values (with types?)

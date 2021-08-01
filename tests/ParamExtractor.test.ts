@@ -16,8 +16,9 @@ const command = new Command(
 const target = new ParamExtractor();
 
 describe('ParamExtractor', () => {
-    test('should return an error if an invalid parameter is passed', () => {
-        const input = 'non_exisiting'.split(' ');
+    test('should return an error if an invalid parameter is passed after all required params are given', () => {
+        const input = 'par 2 non_exisiting'.split(' ');
+
         expect(target.parseInput(input, command)).toStrictEqual(new ParamError('Invalid parameter non_exisiting'));
     });
 
@@ -47,9 +48,42 @@ describe('ParamExtractor', () => {
         });
 
         test('Params arguments should be case-sensitive', () => {
-            const input = 'PAR 2 -r AbCdEf'.split(' ');
+            const input = 'par 2 -r AbCdEf'.split(' ');
 
             expect(target.parseInput(input, command)).toHaveProperty('rap', 'AbCdEf');
+        });
+
+        test('Params arguments match expected type', () => {
+            const input = 'par AbCdEf'.split(' ');
+
+            expect(target.parseInput(input, command)).toStrictEqual(new ParamError('Invalid argument type for param: par, Integer expected'));
+        });
+
+        test('Params required arguments should be managed also based on position without param name', () => {
+            const commandWith2Required = new Command(
+                'cmd',
+                [
+                    new Param('par', 'p', PropType.Integer, PropConstraint.Required, 'par description'),
+                    new Param('rap', 'r', PropType.String, PropConstraint.Required, 'par description'),
+                    new Flag('flag', 'f', 'flag description'),
+                    new Flag('nflag', 'n', 'nflag description')
+                ],
+                ({ params }) => { params; },
+                'a test cmd'
+            );
+            const input = '2 AbCdEf -f'.split(' ');
+
+            expect(target.parseInput(input, commandWith2Required)).toHaveProperty('par', 2);
+            expect(target.parseInput(input, commandWith2Required)).toHaveProperty('rap', 'AbCdEf');
+            expect(target.parseInput(input, commandWith2Required)).toHaveProperty('flag', true);
+        });
+
+        test('Params duplication should return an error', () => {
+            const input = 'par 3 par 2'.split(' ');
+            const input1 = 'par 2 par 3'.split(' ');
+
+            expect(target.parseInput(input, command)).toStrictEqual(new ParamError('Param: par already existing'));
+            expect(target.parseInput(input1, command)).toStrictEqual(new ParamError('Param: par already existing'));
         });
     });
 

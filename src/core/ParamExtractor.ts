@@ -10,7 +10,6 @@ export interface InputParser {
 export default class ParamExtractor implements InputParser {
     parseInput(input: Array<string>, command: Command): Either<ParamError, Record<string, any>> {
         const cliArguments = {};
-        console.log(input);
 
         const matchError = this.findAndStoreParam(input, command, cliArguments);
         if (matchError)
@@ -34,27 +33,43 @@ export default class ParamExtractor implements InputParser {
         const findParamAtIndex = (index: number): CliParam => {
             const normalizedInput = input[index].toLowerCase();
             return command.params.find(x =>
-                x.name == normalizedInput
-                || `-${x.shortName}` == normalizedInput
+                x.name === normalizedInput
+                || `-${x.shortName}` === normalizedInput
                 || (
-                    `--${x.name}` == normalizedInput && x instanceof Flag
+                    `--${x.name}` === normalizedInput && x instanceof Flag
                 )
             );
         }
 
         const increaseIndexConditional = (cliParam: CliParam, index: number): number => {
-            if (cliParam instanceof Flag) {
-                return index;
+            const lowercaseInput = input.map(x => x.toLowerCase());
+            if (lowercaseInput.find(x => x === cliParam.name || x === `-${cliParam.shortName}`)) {
+                return index + 1;
             }
-            return index + 1;
+
+            return index;
+        }
+
+        const findRequiredParamsArgumentsPositionally = (): CliParam => {
+            const firstRequiredParam = command.params.find(x => 
+                x instanceof Param 
+                && !cliArguments[x.name] 
+                && x.constraint == PropConstraint.Required
+            );
+            
+            return firstRequiredParam;
         }
 
         // todo --> ensure no duplicated values are allowed!
         while (i < inputCount) {
-            let cliParamOption = findParamAtIndex(i);
+            let cliParamOption = findParamAtIndex(i) || findRequiredParamsArgumentsPositionally();
             if (cliParamOption) {
                 i = increaseIndexConditional(cliParamOption, i);
-                this.storeArguments(cliArguments, cliParamOption, input[i]);
+                console.log(cliParamOption, input[i]);
+                const storeOptionError = this.storeArguments(cliArguments, cliParamOption, input[i]);
+                if (storeOptionError) {
+                    return storeOptionError;
+                }
 
             } else {
                 const errorOption = this.storeChainedFlags(command, cliArguments, input[i]);
@@ -83,7 +98,6 @@ export default class ParamExtractor implements InputParser {
 
         flagsWithShortName.map(x => {
             unhandledInput = unhandledInput.replace(x.shortName, '');
-            console.log(unhandledInput, x.shortName);
             this.storeArguments(cliArguments, x);
         });
 
@@ -98,7 +112,11 @@ export default class ParamExtractor implements InputParser {
             .map((flag) => this.storeArguments(cliArguments, flag, 'false'));
     }
 
-    private storeArguments(cliArguments: object, cliParam: CliParam, value?: string): void {
+    private storeArguments(cliArguments: object, cliParam: CliParam, value?: string): ParamError {
+        if (cliArguments[cliParam.name]) {
+            return new ParamError(`Param: ${cliParam.name} already existing`);
+        }
+
         if (cliParam instanceof Param) {
             switch (cliParam.type) {
                 case PropType.Integer:
@@ -112,11 +130,17 @@ export default class ParamExtractor implements InputParser {
                     break;
                 // TODO arrays
             }
+
+            if (isNaN(cliArguments[cliParam.name]) && cliParam.type != PropType.String) {
+                return new ParamError(`Invalid argument type for param: ${cliParam.name}, ${PropType[cliParam.type]} expected`);
+            }
         } else if (cliParam instanceof Flag) {
             cliArguments[cliParam.name] = value === 'false' ? false : true;
         } else {
             //... TODO error
         }
+
+        return;
     }
 
 }
