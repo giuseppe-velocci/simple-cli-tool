@@ -33,17 +33,21 @@ export default class ParamExtractor implements InputParser {
         const findParamAtIndex = (index: number): CliParam => {
             const normalizedInput = input[index].toLowerCase();
             return command.params.find(x =>
-                x.name === normalizedInput
-                || `-${x.shortName}` === normalizedInput
-                || (
-                    `--${x.name}` === normalizedInput && x instanceof Flag
-                )
+                `-${x.shortName.toLowerCase()}` === normalizedInput ||
+                `--${x.name.toLowerCase()}` === normalizedInput
             );
         }
 
-        const increaseIndexConditional = (cliParam: CliParam, index: number): number => {
+        const increaseIndexIfRequired = (cliParam: CliParam, index: number): number => {
+            if (cliParam instanceof Flag) {
+                return index;
+            }
+
             const lowercaseInput = input.map(x => x.toLowerCase());
-            if (lowercaseInput.find(x => x === cliParam.name || x === `-${cliParam.shortName}`)) {
+            if (lowercaseInput.find(x =>
+                x === `--${cliParam.name.toLowerCase()}` ||
+                x === `-${cliParam.shortName.toLowerCase()}`
+            )) {
                 return index + 1;
             }
 
@@ -51,21 +55,19 @@ export default class ParamExtractor implements InputParser {
         }
 
         const findRequiredParamsArgumentsPositionally = (): CliParam => {
-            const firstRequiredParam = command.params.find(x => 
-                x instanceof Param 
-                && !cliArguments[x.name] 
-                && x.constraint == PropConstraint.Required
+            const firstRequiredParam = command.params.find(x =>
+                x instanceof Param &&
+                !cliArguments[x.name.toLowerCase()] &&
+                x.constraint == PropConstraint.Required
             );
-            
+
             return firstRequiredParam;
         }
 
-        // todo --> ensure no duplicated values are allowed!
         while (i < inputCount) {
             let cliParamOption = findParamAtIndex(i) || findRequiredParamsArgumentsPositionally();
             if (cliParamOption) {
-                i = increaseIndexConditional(cliParamOption, i);
-                console.log(cliParamOption, input[i]);
+                i = increaseIndexIfRequired(cliParamOption, i);
                 const storeOptionError = this.storeArguments(cliArguments, cliParamOption, input[i]);
                 if (storeOptionError) {
                     return storeOptionError;
@@ -78,14 +80,14 @@ export default class ParamExtractor implements InputParser {
             }
             i++;
         }
-
-        return;
     };
 
     private findMissingRequiredParams(command: Command, cliArguments: Record<string, any>): ParamError {
-        const missingRequiredParam = command.params.find(cliParam => cliParam instanceof Param &&
+        const missingRequiredParam = command.params.find(cliParam =>
+            cliParam instanceof Param &&
             cliParam.constraint === PropConstraint.Required &&
-            !cliArguments[cliParam.name])
+            !cliArguments[cliParam.name]
+        );
         if (missingRequiredParam)
             return new ParamError(`Missing required parameter: ${missingRequiredParam.name}`);
         return undefined;
@@ -97,8 +99,10 @@ export default class ParamExtractor implements InputParser {
             .filter(x => x instanceof Flag && x.shortName.length > 0);
 
         flagsWithShortName.map(x => {
-            unhandledInput = unhandledInput.replace(x.shortName, '');
-            this.storeArguments(cliArguments, x);
+            if (unhandledInput.includes(x.shortName)) {
+                unhandledInput = unhandledInput.replace(x.shortName, '');
+                this.storeArguments(cliArguments, x);
+            }
         });
 
         if (unhandledInput.length > 0)
@@ -139,8 +143,5 @@ export default class ParamExtractor implements InputParser {
         } else {
             //... TODO error
         }
-
-        return;
     }
-
 }
