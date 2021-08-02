@@ -57,7 +57,7 @@ export default class ParamExtractor implements InputParser {
         const findRequiredParamsArgumentsPositionally = (): CliParam => {
             const firstRequiredParam = command.params.find(x =>
                 x instanceof Param &&
-                !cliArguments[x.name.toLowerCase()] &&
+                !cliArguments[x.name] &&
                 x.constraint == PropConstraint.Required
             );
 

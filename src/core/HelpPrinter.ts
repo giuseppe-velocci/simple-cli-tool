@@ -85,10 +85,7 @@ export default class HelpPrinterImpl implements HelpPrinter, CommandHelpPrinter 
 
     private getParamNameAndDescription(param: CliParam): string {
         const getParamsText = (x: CliParam) => {
-            if (x instanceof Flag)
-                return '\n' + x.shortName ? `--${x.name} | -${x.shortName}` : `--${x.name}`;
-
-            return '\n' + x.shortName ? `${x.name} | -${x.shortName}` : `${x.name}`;
+            return '\n' + x.shortName ? `--${x.name} | -${x.shortName}` : `--${x.name}`;
         };
 
         const text = getParamsText(param);
