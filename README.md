@@ -26,7 +26,7 @@ In order to customize your cli command name, assign your node project the same n
 Add the filepath to the executable to the PATH env variable of your system, than start a new terminal and input the name of the executable (without extension) followed by commands and optionally parameters for it to run.
  Example with param full name version and full name flag:
 
- `$ app greet person Mary --nighttime`
+ `$ app greet --person Mary --nighttime`
 
  Example with param short version and short name flag:
  
