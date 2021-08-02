@@ -46,7 +46,7 @@ export default class EntryPointImpl implements EntryPoint {
             if (!cmdInput)
                 instance.io.error('invalid input');
 
-            const cmd = extendedCommands.find(c => c.name == cmdInput);
+            const cmd = extendedCommands.find(c => c.name.toLowerCase() == cmdInput);
             if (!cmd)
                 instance.io.error('command not found');
 

@@ -15,7 +15,7 @@ describe('EntryPointImpl', () => {
 
     const getCommands = (io: ClIO): Array<Command> => [
         new Command(
-            'greet',
+            'Greet',
             [
                 new Param('person', 'p', PropType.String, PropConstraint.Required, 'person to be greeted'),
                 new Flag('nighttime', 'n', 'if it is night time'),
@@ -35,7 +35,17 @@ describe('EntryPointImpl', () => {
 
     test('should handle command', () => {
         const user = new User();
-        user.willInput(['greet -p Io']);
+        user.willInput(['Greet -p Io']);
+        const io = new ClIOTest(user);
+        const entryPoint = getEntryPoint(io);
+
+        entryPoint.start();
+        expect(io.printedValues).toStrictEqual(['Hello Io!']);
+    });
+
+    test('should handle command case-insensitive', () => {
+        const user = new User();
+        user.willInput(['GREET -p Io']);
         const io = new ClIOTest(user);
         const entryPoint = getEntryPoint(io);
 
